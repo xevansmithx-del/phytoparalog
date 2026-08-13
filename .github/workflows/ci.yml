@@ -1,0 +1,195 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  core:
+    name: Core / Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Set up locked dependency runner
+        uses: astral-sh/setup-uv@ae62891fec2bb8e7d6c99fc78c9fec3a63790f8d # v10.0.0
+        with:
+          version: "0.11.20"
+          enable-cache: false
+      - name: Install from frozen lock
+        run: uv sync --frozen --extra dev --python python
+      - name: Lint
+        run: uv run --frozen --no-sync ruff check .
+      - name: Check formatting
+        run: uv run --frozen --no-sync ruff format --check .
+      - name: Run pinned repository hooks
+        run: uv run --frozen --no-sync pre-commit run --all-files
+      - name: Unit tests
+        run: >-
+          uv run --frozen --no-sync pytest
+          --cov=phytoparalog --cov=phytoparalog_integrations
+          --cov-report=term-missing
+      - name: Public-surface privacy scan
+        run: uv run --frozen --no-sync python scripts/privacy_scan.py .
+
+  tooluniverse:
+    name: ToolUniverse 1.4.1 clean-wheel contract
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - name: Set up locked dependency runner
+        uses: astral-sh/setup-uv@ae62891fec2bb8e7d6c99fc78c9fec3a63790f8d # v10.0.0
+        with:
+          version: "0.11.20"
+          enable-cache: false
+      - name: Install exact ToolUniverse runtime from frozen lock
+        run: uv sync --frozen --extra dev --extra tooluniverse --python python
+      - name: Direct, registration, loaded, schema, and forgery tests
+        run: uv run --frozen --no-sync pytest -q tests/test_tooluniverse_plugin.py
+      - name: Build wheel without dependency isolation
+        run: >-
+          uv run --frozen --no-sync python -m build
+          --no-isolation --wheel --outdir "$RUNNER_TEMP/tu-dist"
+      - name: Smoke-test installed wheel in a clean locked environment
+        run: |
+          uv export --frozen --extra dev --extra tooluniverse \
+            --no-emit-project --output-file "$RUNNER_TEMP/tu-requirements.txt"
+          uv venv "$RUNNER_TEMP/tu-smoke" --python python
+          uv pip sync --python "$RUNNER_TEMP/tu-smoke/bin/python" \
+            "$RUNNER_TEMP/tu-requirements.txt"
+          uv pip install --python "$RUNNER_TEMP/tu-smoke/bin/python" \
+            --no-deps "$RUNNER_TEMP"/tu-dist/*.whl
+          "$RUNNER_TEMP/tu-smoke/bin/python" -c "from tooluniverse import ToolUniverse; names=['PhytoParalog_preflight','PhytoParalog_compile','PhytoParalog_validate_capsule']; tu=ToolUniverse(); tu.load_tools(include_tools=names); assert set(names) <= set(tu.all_tool_dict); assert tu.tools.PhytoParalog_compile(fixture_id='synthetic-minimal-v1')['status']=='success'"
+          "$RUNNER_TEMP/tu-smoke/bin/python" -m pytest -q tests/test_tooluniverse_plugin.py
+
+  independent-integrations:
+    name: PEC and PhytoResolve immutable contracts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - name: Set up locked dependency runner
+        uses: astral-sh/setup-uv@ae62891fec2bb8e7d6c99fc78c9fec3a63790f8d # v10.0.0
+        with:
+          version: "0.11.20"
+          enable-cache: false
+      - name: Install immutable integration revisions from frozen lock
+        run: uv sync --frozen --extra dev --group integrations --python python
+      - name: Run conservative judgment and exact-head append tests
+        run: uv run --frozen --no-sync pytest -q tests/test_integration_contracts.py
+
+  package:
+    name: Reproducible source and wheel distributions
+    runs-on: ubuntu-latest
+    needs: [core, tooluniverse, independent-integrations]
+    env:
+      SOURCE_DATE_EPOCH: "1786579200"
+      PYTHONHASHSEED: "0"
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - name: Set up locked dependency runner
+        uses: astral-sh/setup-uv@ae62891fec2bb8e7d6c99fc78c9fec3a63790f8d # v10.0.0
+        with:
+          version: "0.11.20"
+          enable-cache: false
+      - name: Install complete release test stack from frozen lock
+        run: >-
+          uv sync --frozen --extra dev --extra tooluniverse
+          --group integrations --python python
+      - name: Verify source
+        run: |
+          uv run --frozen --no-sync ruff check .
+          uv run --frozen --no-sync ruff format --check .
+          uv run --frozen --no-sync pytest
+          uv run --frozen --no-sync python scripts/privacy_scan.py .
+      - name: Build twice and require byte identity
+        run: |
+          uv run --frozen --no-sync python -m build --no-isolation --outdir dist-one
+          uv run --frozen --no-sync python -m build --no-isolation --outdir dist-two
+          uv run --frozen --no-sync python -m twine check dist-one/* dist-two/*
+          cmp dist-one/phytoparalog-0.1.0-py3-none-any.whl dist-two/phytoparalog-0.1.0-py3-none-any.whl
+          cmp dist-one/phytoparalog-0.1.0.tar.gz dist-two/phytoparalog-0.1.0.tar.gz
+      - name: Extract and privacy-scan distributions
+        run: |
+          mkdir -p "$RUNNER_TEMP/wheel-tree" "$RUNNER_TEMP/sdist-tree"
+          uv run --frozen --no-sync python -m zipfile -e \
+            dist-one/phytoparalog-0.1.0-py3-none-any.whl "$RUNNER_TEMP/wheel-tree"
+          uv run --frozen --no-sync python -m tarfile -e \
+            dist-one/phytoparalog-0.1.0.tar.gz "$RUNNER_TEMP/sdist-tree"
+          sdist_root="$RUNNER_TEMP/sdist-tree/phytoparalog-0.1.0"
+          test -f "$sdist_root/README.md"
+          test -f "$sdist_root/.pre-commit-config.yaml"
+          test -f "$sdist_root/LICENSE"
+          test -f "$sdist_root/uv.lock"
+          test -f "$sdist_root/docs/architecture.md"
+          test -f "$sdist_root/examples/synthetic/study.json"
+          test -f "$sdist_root/scripts/privacy_scan.py"
+          uv run --frozen --no-sync python scripts/privacy_scan.py "$RUNNER_TEMP/wheel-tree"
+          uv run --frozen --no-sync python scripts/privacy_scan.py "$sdist_root"
+      - name: Smoke-test clean source distribution
+        run: |
+          cd "$RUNNER_TEMP/sdist-tree/phytoparalog-0.1.0"
+          uv sync --frozen --extra dev --extra tooluniverse \
+            --group integrations --python python
+          uv run --frozen --no-sync pytest
+          uv run --frozen --no-sync phytoparalog validate examples/synthetic/study.json
+          uv run --frozen --no-sync phytoparalog compile \
+            examples/synthetic/study.json "$RUNNER_TEMP/sdist-capsule"
+          uv run --frozen --no-sync phytoparalog validate-capsule \
+            "$RUNNER_TEMP/sdist-capsule" --study examples/synthetic/study.json
+      - name: Smoke-test clean wheel
+        run: |
+          uv export --frozen --extra dev --extra tooluniverse --group integrations \
+            --no-emit-project --output-file "$RUNNER_TEMP/wheel-requirements.txt"
+          uv venv "$RUNNER_TEMP/wheel-venv" --python python
+          uv pip sync --python "$RUNNER_TEMP/wheel-venv/bin/python" \
+            "$RUNNER_TEMP/wheel-requirements.txt"
+          uv pip install --python "$RUNNER_TEMP/wheel-venv/bin/python" \
+            --no-deps dist-one/phytoparalog-0.1.0-py3-none-any.whl
+          "$RUNNER_TEMP/wheel-venv/bin/phytoparalog" version
+          "$RUNNER_TEMP/wheel-venv/bin/python" -m pytest
+          "$RUNNER_TEMP/wheel-venv/bin/python" -c "from tooluniverse import ToolUniverse; names=['PhytoParalog_preflight','PhytoParalog_compile','PhytoParalog_validate_capsule']; tu=ToolUniverse(); tu.load_tools(include_tools=names); assert set(names) <= set(tu.all_tool_dict); assert tu.tools.PhytoParalog_validate_capsule(fixture_id='synthetic-minimal-v1')['data']['validation_mode']=='STUDY_RECOMPUTED'"
+      - name: Record distribution hashes
+        run: (cd dist-one && sha256sum phytoparalog-* > SHA256SUMS)
+      - name: Upload verified distributions
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: phytoparalog-dist
+          path: dist-one/*
+          if-no-files-found: error
+          retention-days: 14

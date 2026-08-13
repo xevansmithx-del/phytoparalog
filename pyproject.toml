@@ -1,0 +1,98 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "phytoparalog"
+version = "0.1.0"
+description = "Fail-closed plant paralog identity and expression-identifiability compiler"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+authors = [{ name = "Evan Smith" }]
+keywords = ["plant biology", "paralogs", "transcriptomics", "provenance", "reproducibility"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+  "build>=1.2,<2",
+  "hatchling>=1.27",
+  "jsonschema>=4.23,<5",
+  "pre-commit>=4.3,<5",
+  "pytest>=8.3",
+  "pytest-cov>=6.0",
+  "ruff>=0.9",
+  "twine>=6.1,<7",
+]
+tooluniverse = ["tooluniverse==1.4.1"]
+
+[dependency-groups]
+integrations = [
+  "plant-evidence-compiler @ git+https://github.com/xevansmithx-del/plant-evidence-compiler.git@2221a74866e0b3fc3e80767ab5102ab8354df8b4",
+  "phytoresolve @ git+https://github.com/xevansmithx-del/phytoresolve.git@954ec58bf81bbc8b57b1819cdbf8431584a37b83",
+]
+
+[project.scripts]
+phytoparalog = "phytoparalog.cli:main"
+
+[project.entry-points."tooluniverse.plugins"]
+phytoparalog = "phytoparalog_tu"
+
+[project.urls]
+Repository = "https://github.com/xevansmithx-del/phytoparalog"
+Issues = "https://github.com/xevansmithx-del/phytoparalog/issues"
+
+[tool.hatch.build.targets.wheel]
+core-metadata-version = "2.4"
+packages = [
+  "src/phytoparalog",
+  "src/phytoparalog_integrations",
+  "src/phytoparalog_tu",
+]
+
+[tool.hatch.build.targets.sdist]
+core-metadata-version = "2.4"
+include = [
+  "/.pre-commit-config.yaml",
+  "/.github",
+  "/CHANGELOG.md",
+  "/CITATION.cff",
+  "/CODE_OF_CONDUCT.md",
+  "/CONTRIBUTING.md",
+  "/LICENSE",
+  "/MANIFEST.in",
+  "/NOTICE",
+  "/README.md",
+  "/SECURITY.md",
+  "/docs",
+  "/examples",
+  "/pyproject.toml",
+  "/scripts",
+  "/src",
+  "/tests",
+  "/uv.lock",
+]
+
+[tool.pytest.ini_options]
+addopts = "-ra --strict-markers"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+
+[tool.ruff.format]
+quote-style = "double"

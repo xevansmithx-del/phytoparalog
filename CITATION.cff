@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use PhytoParalog, please cite this software and the version you ran."
+title: "PhytoParalog: fail-closed plant paralog identifiability compiler"
+type: software
+authors:
+  - family-names: Smith
+    given-names: Evan
+version: 0.1.0
+date-released: 2026-08-13
+license: Apache-2.0
+repository-code: "https://github.com/xevansmithx-del/phytoparalog"
+url: "https://github.com/xevansmithx-del/phytoparalog"
+keywords:
+  - plant genomics
+  - paralogs
+  - transcript identifiability
+  - provenance
+  - reproducible research

@@ -1,0 +1,93 @@
+{
+  "bound_memory_head_sha256": null,
+  "equivalence_classes": [
+    {
+      "counts": {"OBS_1": 5, "OBS_2": 7, "OBS_3": 6},
+      "ec_id": "EC_A",
+      "evidence_receipt_ids": ["REC_EC_A"],
+      "transcript_ids": ["TX_A"]
+    },
+    {
+      "counts": {"OBS_1": 4, "OBS_2": 3, "OBS_3": 5},
+      "ec_id": "EC_B",
+      "evidence_receipt_ids": ["REC_EC_B"],
+      "transcript_ids": ["TX_B"]
+    },
+    {
+      "counts": {"OBS_1": 2, "OBS_2": 2, "OBS_3": 2},
+      "ec_id": "EC_SHARED",
+      "evidence_receipt_ids": ["REC_EC_SHARED"],
+      "transcript_ids": ["TX_A", "TX_B"]
+    }
+  ],
+  "members": [
+    {
+      "identity_receipt_ids": ["REC_MEMBER_A"],
+      "identity_state": "EXACT",
+      "locus_id": "LOC_A",
+      "member_id": "FAM_A"
+    },
+    {
+      "identity_receipt_ids": ["REC_MEMBER_B"],
+      "identity_state": "EXACT",
+      "locus_id": "LOC_B",
+      "member_id": "FAM_B"
+    }
+  ],
+  "observation_units": [
+    {
+      "biological_unit_id": "UNIT_1",
+      "condition_id": "CONDITION_A",
+      "independence_receipt_id": "REC_OBS_1",
+      "independence_state": "RECEIPT_VERIFIED",
+      "observation_id": "OBS_1",
+      "parent_observation_id": null
+    },
+    {
+      "biological_unit_id": "UNIT_2",
+      "condition_id": "CONDITION_A",
+      "independence_receipt_id": "REC_OBS_2",
+      "independence_state": "RECEIPT_VERIFIED",
+      "observation_id": "OBS_2",
+      "parent_observation_id": null
+    },
+    {
+      "biological_unit_id": "UNIT_3",
+      "condition_id": "CONDITION_A",
+      "independence_receipt_id": "REC_OBS_3",
+      "independence_state": "RECEIPT_VERIFIED",
+      "observation_id": "OBS_3",
+      "parent_observation_id": null
+    }
+  ],
+  "reference_scope": {
+    "competitive_background_state": "DECLARED_COMPLETE",
+    "competitive_member_ids": ["FAM_A", "FAM_B"],
+    "family_id": "FAM",
+    "family_member_ids": ["FAM_A", "FAM_B"],
+    "kmer_size": 5,
+    "scope_receipt_ids": ["REC_SCOPE"]
+  },
+  "schema_version": "phytoparalog.study.v0.1",
+  "source_receipts": [
+    {"artifact_sha256": "704c834d31eaafc48bbe94e001f8103c78e74168b610c039a0849bcb87d07449", "issuer": "SYNTHETIC_FIXTURE_GENERATOR", "receipt_id": "REC_MEMBER_A", "receipt_type": "MEMBER_IDENTITY", "record_id": "MEM_A", "source_version": "1", "subject_sha256": "704c834d31eaafc48bbe94e001f8103c78e74168b610c039a0849bcb87d07449", "verification_method": "SHA256_RECALCULATED", "verification_state": "RECEIPT_VERIFIED"},
+    {"artifact_sha256": "da3aad7653394749cdb4a68527189146b09f9cae69831de5a5b6407df34b0f35", "issuer": "SYNTHETIC_FIXTURE_GENERATOR", "receipt_id": "REC_MEMBER_B", "receipt_type": "MEMBER_IDENTITY", "record_id": "MEM_B", "source_version": "1", "subject_sha256": "da3aad7653394749cdb4a68527189146b09f9cae69831de5a5b6407df34b0f35", "verification_method": "SHA256_RECALCULATED", "verification_state": "RECEIPT_VERIFIED"},
+    {"artifact_sha256": "2f343951133659f28c664b14c73e488d441523a821037bfa48f7dff173dc6dd1", "issuer": "SYNTHETIC_FIXTURE_GENERATOR", "receipt_id": "REC_TX_A", "receipt_type": "TRANSCRIPT_SEQUENCE", "record_id": "TX_A_RECORD", "source_version": "1", "subject_sha256": "2f343951133659f28c664b14c73e488d441523a821037bfa48f7dff173dc6dd1", "verification_method": "SHA256_RECALCULATED", "verification_state": "RECEIPT_VERIFIED"},
+    {"artifact_sha256": "37c98ba2da82ad89b2bc4c0bbd5dc2243d947bd07f007408a797e67fd3baa8f0", "issuer": "SYNTHETIC_FIXTURE_GENERATOR", "receipt_id": "REC_TX_B", "receipt_type": "TRANSCRIPT_SEQUENCE", "record_id": "TX_B_RECORD", "source_version": "1", "subject_sha256": "37c98ba2da82ad89b2bc4c0bbd5dc2243d947bd07f007408a797e67fd3baa8f0", "verification_method": "SHA256_RECALCULATED", "verification_state": "RECEIPT_VERIFIED"},
+    {"artifact_sha256": "614ca478a0de30b2085ada95c9f0d877124f28406c804a954913a6e955a57a79", "issuer": "SYNTHETIC_FIXTURE_GENERATOR", "receipt_id": "REC_SCOPE", "receipt_type": "REFERENCE_SCOPE", "record_id": "SCOPE_RECORD", "source_version": "1", "subject_sha256": "614ca478a0de30b2085ada95c9f0d877124f28406c804a954913a6e955a57a79", "verification_method": "SHA256_RECALCULATED", "verification_state": "RECEIPT_VERIFIED"},
+    {"artifact_sha256": "880264abe31b1ea8a12be5c2cd9573f50530f47dea813d86b2fe85c8a03858c4", "issuer": "SYNTHETIC_FIXTURE_GENERATOR", "receipt_id": "REC_OBS_1", "receipt_type": "OBSERVATION_UNIT", "record_id": "OBS_1_RECORD", "source_version": "1", "subject_sha256": "880264abe31b1ea8a12be5c2cd9573f50530f47dea813d86b2fe85c8a03858c4", "verification_method": "SHA256_RECALCULATED", "verification_state": "RECEIPT_VERIFIED"},
+    {"artifact_sha256": "11e02fa515c7f9d5a477255eac6fa3156c2df6e6742901e5f765335d4d0c2d6a", "issuer": "SYNTHETIC_FIXTURE_GENERATOR", "receipt_id": "REC_OBS_2", "receipt_type": "OBSERVATION_UNIT", "record_id": "OBS_2_RECORD", "source_version": "1", "subject_sha256": "11e02fa515c7f9d5a477255eac6fa3156c2df6e6742901e5f765335d4d0c2d6a", "verification_method": "SHA256_RECALCULATED", "verification_state": "RECEIPT_VERIFIED"},
+    {"artifact_sha256": "c51bddb23a2d305d88abf8572de3d13492afa1253ca070e8f040358b39315ca5", "issuer": "SYNTHETIC_FIXTURE_GENERATOR", "receipt_id": "REC_OBS_3", "receipt_type": "OBSERVATION_UNIT", "record_id": "OBS_3_RECORD", "source_version": "1", "subject_sha256": "c51bddb23a2d305d88abf8572de3d13492afa1253ca070e8f040358b39315ca5", "verification_method": "SHA256_RECALCULATED", "verification_state": "RECEIPT_VERIFIED"},
+    {"artifact_sha256": "b187f7efca60155b741360a94d8ec41d3690d32c59d2cd65e1ed818aad8d3cf3", "issuer": "SYNTHETIC_FIXTURE_GENERATOR", "receipt_id": "REC_EC_A", "receipt_type": "EQUIVALENCE_CLASS", "record_id": "EC_A_RECORD", "source_version": "1", "subject_sha256": "b187f7efca60155b741360a94d8ec41d3690d32c59d2cd65e1ed818aad8d3cf3", "verification_method": "SHA256_RECALCULATED", "verification_state": "RECEIPT_VERIFIED"},
+    {"artifact_sha256": "3d80b4cc6c2dbed55db5bc9a5d454117f3666eda19f0d3393d7a48f2091c0d85", "issuer": "SYNTHETIC_FIXTURE_GENERATOR", "receipt_id": "REC_EC_B", "receipt_type": "EQUIVALENCE_CLASS", "record_id": "EC_B_RECORD", "source_version": "1", "subject_sha256": "3d80b4cc6c2dbed55db5bc9a5d454117f3666eda19f0d3393d7a48f2091c0d85", "verification_method": "SHA256_RECALCULATED", "verification_state": "RECEIPT_VERIFIED"},
+    {"artifact_sha256": "18b4e68b9c9f50ed0a296a5c5e80a56d114d7552323909e133653ef029e48e79", "issuer": "SYNTHETIC_FIXTURE_GENERATOR", "receipt_id": "REC_EC_SHARED", "receipt_type": "EQUIVALENCE_CLASS", "record_id": "EC_SHARED_RECORD", "source_version": "1", "subject_sha256": "18b4e68b9c9f50ed0a296a5c5e80a56d114d7552323909e133653ef029e48e79", "verification_method": "SHA256_RECALCULATED", "verification_state": "RECEIPT_VERIFIED"}
+  ],
+  "species": "Synthetic plant",
+  "stock_id": "SYNTHETIC_STOCK",
+  "study_id": "synthetic-identifiability",
+  "target_selection": {"allowed": false, "status": "PROHIBITED"},
+  "transcripts": [
+    {"member_id": "FAM_A", "sequence": "AAAAACCCCCGGGGG", "sequence_receipt_id": "REC_TX_A", "source_record": "TX_A_RECORD", "source_version": "1", "transcript_id": "TX_A"},
+    {"member_id": "FAM_B", "sequence": "AAAAATTTTTGGGGG", "sequence_receipt_id": "REC_TX_B", "source_record": "TX_B_RECORD", "source_version": "1", "transcript_id": "TX_B"}
+  ]
+}

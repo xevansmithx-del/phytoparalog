@@ -1,0 +1,48 @@
+name: Bug report
+description: Report reproducible incorrect behavior without private biological data.
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Do not attach unpublished sequences, credentials, controlled metadata, or local paths.
+  - type: input
+    id: version
+    attributes:
+      label: PhytoParalog version
+      placeholder: 0.1.0
+    validations:
+      required: true
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Surface
+      options:
+        - Python API
+        - CLI
+        - Capsule validation
+        - ToolUniverse plugin
+        - PEC integration
+        - PhytoResolve integration
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Synthetic reproduction
+      description: Provide the smallest synthetic example and exact command.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and observed behavior
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Public-data confirmation
+      options:
+        - label: This report contains no private data, raw real sequence, secret, or personal path.
+          required: true

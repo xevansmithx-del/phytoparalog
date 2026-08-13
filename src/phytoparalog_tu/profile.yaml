@@ -1,0 +1,4 @@
+name: PhytoParalog
+description: Local, fail-closed plant paralog identifiability compiler
+version: 0.1.0
+required_env: []
