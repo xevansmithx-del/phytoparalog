@@ -84,13 +84,16 @@ jobs:
             "$RUNNER_TEMP/wheel-requirements.txt"
           uv pip install --python "$RUNNER_TEMP/release-wheel/bin/python" \
             --no-deps dist-one/phytoparalog-0.1.0-py3-none-any.whl
-          "$RUNNER_TEMP/release-wheel/bin/phytoparalog" version
-          "$RUNNER_TEMP/release-wheel/bin/phytoparalog" compile \
-            examples/synthetic/study.json "$RUNNER_TEMP/release-capsule"
-          "$RUNNER_TEMP/release-wheel/bin/phytoparalog" validate-capsule \
-            "$RUNNER_TEMP/release-capsule" --study examples/synthetic/study.json
-          "$RUNNER_TEMP/release-wheel/bin/python" -m pytest
-          "$RUNNER_TEMP/release-wheel/bin/python" -c "from tooluniverse import ToolUniverse; names=['PhytoParalog_preflight','PhytoParalog_compile','PhytoParalog_validate_capsule']; tu=ToolUniverse(); tu.load_tools(include_tools=names); assert set(names) <= set(tu.all_tool_dict); assert tu.tools.PhytoParalog_validate_capsule(fixture_id='synthetic-minimal-v1')['data']['validation_mode']=='STUDY_RECOMPUTED'"
+          (
+            cd "$sdist_root"
+            "$RUNNER_TEMP/release-wheel/bin/phytoparalog" version
+            "$RUNNER_TEMP/release-wheel/bin/phytoparalog" compile \
+              examples/synthetic/study.json "$RUNNER_TEMP/release-capsule"
+            "$RUNNER_TEMP/release-wheel/bin/phytoparalog" validate-capsule \
+              "$RUNNER_TEMP/release-capsule" --study examples/synthetic/study.json
+            "$RUNNER_TEMP/release-wheel/bin/python" -m pytest
+            "$RUNNER_TEMP/release-wheel/bin/python" -c "from tooluniverse import ToolUniverse; names=['PhytoParalog_preflight','PhytoParalog_compile','PhytoParalog_validate_capsule']; tu=ToolUniverse(); tu.load_tools(include_tools=names); assert set(names) <= set(tu.all_tool_dict); assert tu.tools.PhytoParalog_validate_capsule(fixture_id='synthetic-minimal-v1')['data']['validation_mode']=='STUDY_RECOMPUTED'"
+          )
           (cd dist-one && sha256sum phytoparalog-* > SHA256SUMS)
       - name: Upload verified release artifacts
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
