@@ -142,16 +142,16 @@ jobs:
           uv run --frozen --no-sync python -m build --no-isolation --outdir dist-one
           uv run --frozen --no-sync python -m build --no-isolation --outdir dist-two
           uv run --frozen --no-sync python -m twine check dist-one/* dist-two/*
-          cmp dist-one/phytoparalog-0.1.0-py3-none-any.whl dist-two/phytoparalog-0.1.0-py3-none-any.whl
-          cmp dist-one/phytoparalog-0.1.0.tar.gz dist-two/phytoparalog-0.1.0.tar.gz
+          cmp dist-one/phytoparalog-0.1.1-py3-none-any.whl dist-two/phytoparalog-0.1.1-py3-none-any.whl
+          cmp dist-one/phytoparalog-0.1.1.tar.gz dist-two/phytoparalog-0.1.1.tar.gz
       - name: Extract and privacy-scan distributions
         run: |
           mkdir -p "$RUNNER_TEMP/wheel-tree" "$RUNNER_TEMP/sdist-tree"
           uv run --frozen --no-sync python -m zipfile -e \
-            dist-one/phytoparalog-0.1.0-py3-none-any.whl "$RUNNER_TEMP/wheel-tree"
+            dist-one/phytoparalog-0.1.1-py3-none-any.whl "$RUNNER_TEMP/wheel-tree"
           uv run --frozen --no-sync python -m tarfile -e \
-            dist-one/phytoparalog-0.1.0.tar.gz "$RUNNER_TEMP/sdist-tree"
-          sdist_root="$RUNNER_TEMP/sdist-tree/phytoparalog-0.1.0"
+            dist-one/phytoparalog-0.1.1.tar.gz "$RUNNER_TEMP/sdist-tree"
+          sdist_root="$RUNNER_TEMP/sdist-tree/phytoparalog-0.1.1"
           test -f "$sdist_root/README.md"
           test -f "$sdist_root/.pre-commit-config.yaml"
           test -f "$sdist_root/LICENSE"
@@ -163,7 +163,7 @@ jobs:
           uv run --frozen --no-sync python scripts/privacy_scan.py "$sdist_root"
       - name: Smoke-test clean source distribution
         run: |
-          cd "$RUNNER_TEMP/sdist-tree/phytoparalog-0.1.0"
+          cd "$RUNNER_TEMP/sdist-tree/phytoparalog-0.1.1"
           uv sync --frozen --extra dev --extra tooluniverse \
             --group integrations --python python
           uv run --frozen --no-sync pytest
@@ -180,9 +180,9 @@ jobs:
           uv pip sync --python "$RUNNER_TEMP/wheel-venv/bin/python" \
             "$RUNNER_TEMP/wheel-requirements.txt"
           uv pip install --python "$RUNNER_TEMP/wheel-venv/bin/python" \
-            --no-deps dist-one/phytoparalog-0.1.0-py3-none-any.whl
+            --no-deps dist-one/phytoparalog-0.1.1-py3-none-any.whl
           (
-            cd "$RUNNER_TEMP/sdist-tree/phytoparalog-0.1.0"
+            cd "$RUNNER_TEMP/sdist-tree/phytoparalog-0.1.1"
             "$RUNNER_TEMP/wheel-venv/bin/phytoparalog" version
             "$RUNNER_TEMP/wheel-venv/bin/python" -m pytest
             "$RUNNER_TEMP/wheel-venv/bin/python" -c "from tooluniverse import ToolUniverse; names=['PhytoParalog_preflight','PhytoParalog_compile','PhytoParalog_validate_capsule']; tu=ToolUniverse(); tu.load_tools(include_tools=names); assert set(names) <= set(tu.all_tool_dict); assert tu.tools.PhytoParalog_validate_capsule(fixture_id='synthetic-minimal-v1')['data']['validation_mode']=='STUDY_RECOMPUTED'"

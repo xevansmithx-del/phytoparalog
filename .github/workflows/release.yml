@@ -2,7 +2,7 @@ name: Release
 
 on:
   push:
-    tags: ["v0.1.0"]
+    tags: ["v0.1.1"]
 
 permissions:
   contents: read
@@ -50,16 +50,16 @@ jobs:
           uv run --frozen --no-sync python -m build --no-isolation --outdir dist-one
           uv run --frozen --no-sync python -m build --no-isolation --outdir dist-two
           uv run --frozen --no-sync python -m twine check dist-one/* dist-two/*
-          cmp dist-one/phytoparalog-0.1.0-py3-none-any.whl dist-two/phytoparalog-0.1.0-py3-none-any.whl
-          cmp dist-one/phytoparalog-0.1.0.tar.gz dist-two/phytoparalog-0.1.0.tar.gz
+          cmp dist-one/phytoparalog-0.1.1-py3-none-any.whl dist-two/phytoparalog-0.1.1-py3-none-any.whl
+          cmp dist-one/phytoparalog-0.1.1.tar.gz dist-two/phytoparalog-0.1.1.tar.gz
       - name: Extract, scan, and smoke-test
         run: |
           mkdir -p "$RUNNER_TEMP/wheel-tree" "$RUNNER_TEMP/sdist-tree"
           uv run --frozen --no-sync python -m zipfile -e \
-            dist-one/phytoparalog-0.1.0-py3-none-any.whl "$RUNNER_TEMP/wheel-tree"
+            dist-one/phytoparalog-0.1.1-py3-none-any.whl "$RUNNER_TEMP/wheel-tree"
           uv run --frozen --no-sync python -m tarfile -e \
-            dist-one/phytoparalog-0.1.0.tar.gz "$RUNNER_TEMP/sdist-tree"
-          sdist_root="$RUNNER_TEMP/sdist-tree/phytoparalog-0.1.0"
+            dist-one/phytoparalog-0.1.1.tar.gz "$RUNNER_TEMP/sdist-tree"
+          sdist_root="$RUNNER_TEMP/sdist-tree/phytoparalog-0.1.1"
           test -f "$sdist_root/README.md"
           test -f "$sdist_root/.pre-commit-config.yaml"
           test -f "$sdist_root/LICENSE"
@@ -83,7 +83,7 @@ jobs:
           uv pip sync --python "$RUNNER_TEMP/release-wheel/bin/python" \
             "$RUNNER_TEMP/wheel-requirements.txt"
           uv pip install --python "$RUNNER_TEMP/release-wheel/bin/python" \
-            --no-deps dist-one/phytoparalog-0.1.0-py3-none-any.whl
+            --no-deps dist-one/phytoparalog-0.1.1-py3-none-any.whl
           (
             cd "$sdist_root"
             "$RUNNER_TEMP/release-wheel/bin/phytoparalog" version

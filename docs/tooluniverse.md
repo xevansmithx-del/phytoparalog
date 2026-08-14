@@ -5,10 +5,10 @@ entry point and does not patch ToolUniverse source or its default configuration.
 
 ## Install and discover
 
-After downloading the wheel from the `v0.1.0` GitHub release:
+After downloading the wheel from the `v0.1.1` GitHub release:
 
 ```bash
-python -m pip install 'tooluniverse==1.4.1' ./phytoparalog-0.1.0-py3-none-any.whl
+python -m pip install 'tooluniverse==1.4.1' ./phytoparalog-0.1.1-py3-none-any.whl
 tu list | grep PhytoParalog
 ```
 
@@ -99,6 +99,11 @@ are intentionally permissive because ToolUniverse 1.4.1 otherwise replaces schem
 with its native error object. `PhytoParalogTool` owns closed allowed-key, type, digest-pattern, and
 cross-field validation, so malformed and unknown arguments still receive the same strict public
 error envelope—with target selection explicitly prohibited—through the loaded interface.
+
+ToolUniverse 1.4.1 validates `return_schema` against the inner `data` object of a success envelope,
+not against the full envelope. The installed schemas therefore describe success data only. The
+adapter-owned error envelope remains a separate typed contract because `tu test` treats an error
+response as a failed call before return-schema validation.
 
 ## Registration verification
 

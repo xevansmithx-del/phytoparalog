@@ -23,145 +23,59 @@
       }
     ],
     "return_schema": {
-      "oneOf": [
-        {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "status",
-            "data",
-            "target_selected",
-            "target_selection"
-          ],
-          "properties": {
-            "status": {
-              "const": "success"
-            },
-            "data": {
-              "type": "object",
-              "additionalProperties": false,
-              "required": [
-                "authority",
-                "competitive_member_count",
-                "equivalence_class_count",
-                "family_member_count",
-                "member_count",
-                "observation_count",
-                "schema_version",
-                "study_id",
-                "transcript_count",
-                "validated"
-              ],
-              "properties": {
-                "authority": {
-                  "const": "INPUT_VALIDATION_ONLY"
-                },
-                "competitive_member_count": {
-                  "type": "integer",
-                  "minimum": 2
-                },
-                "equivalence_class_count": {
-                  "type": "integer",
-                  "minimum": 0
-                },
-                "family_member_count": {
-                  "type": "integer",
-                  "minimum": 2
-                },
-                "member_count": {
-                  "type": "integer",
-                  "minimum": 2
-                },
-                "observation_count": {
-                  "type": "integer",
-                  "minimum": 0
-                },
-                "schema_version": {
-                  "const": "phytoparalog.study.v0.1"
-                },
-                "study_id": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "transcript_count": {
-                  "type": "integer",
-                  "minimum": 2
-                },
-                "validated": {
-                  "const": true
-                }
-              }
-            },
-            "target_selected": {
-              "const": false
-            },
-            "target_selection": {
-              "type": "object",
-              "additionalProperties": false,
-              "required": [
-                "allowed",
-                "status"
-              ],
-              "properties": {
-                "allowed": {
-                  "const": false
-                },
-                "status": {
-                  "const": "PROHIBITED"
-                }
-              }
-            }
-          }
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "authority",
+        "competitive_member_count",
+        "equivalence_class_count",
+        "family_member_count",
+        "member_count",
+        "observation_count",
+        "schema_version",
+        "study_id",
+        "transcript_count",
+        "validated"
+      ],
+      "properties": {
+        "authority": {
+          "const": "INPUT_VALIDATION_ONLY"
         },
-        {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "status",
-            "error",
-            "error_code",
-            "remediation",
-            "target_selected",
-            "target_selection"
-          ],
-          "properties": {
-            "status": {
-              "const": "error"
-            },
-            "error": {
-              "type": "string",
-              "minLength": 1
-            },
-            "error_code": {
-              "type": "string",
-              "minLength": 1
-            },
-            "remediation": {
-              "type": "string",
-              "minLength": 1
-            },
-            "target_selected": {
-              "const": false
-            },
-            "target_selection": {
-              "type": "object",
-              "additionalProperties": false,
-              "required": [
-                "allowed",
-                "status"
-              ],
-              "properties": {
-                "allowed": {
-                  "const": false
-                },
-                "status": {
-                  "const": "PROHIBITED"
-                }
-              }
-            }
-          }
+        "competitive_member_count": {
+          "type": "integer",
+          "minimum": 2
+        },
+        "equivalence_class_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "family_member_count": {
+          "type": "integer",
+          "minimum": 2
+        },
+        "member_count": {
+          "type": "integer",
+          "minimum": 2
+        },
+        "observation_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "schema_version": {
+          "const": "phytoparalog.study.v0.1"
+        },
+        "study_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "transcript_count": {
+          "type": "integer",
+          "minimum": 2
+        },
+        "validated": {
+          "const": true
         }
-      ]
+      }
     }
   },
   {
@@ -188,183 +102,97 @@
       }
     ],
     "return_schema": {
-      "oneOf": [
-        {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "authority",
+        "core_version",
+        "document_sha256",
+        "hold_reasons",
+        "producer_status",
+        "schema_versions",
+        "study_id"
+      ],
+      "properties": {
+        "authority": {
+          "const": "IDENTIFIABILITY_EVIDENCE_ONLY"
+        },
+        "core_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "document_sha256": {
           "type": "object",
           "additionalProperties": false,
           "required": [
-            "status",
-            "data",
-            "target_selected",
-            "target_selection"
+            "identifiability.json",
+            "pec_candidate_evidence.json",
+            "phytoresolve_proposed_events.json",
+            "study_lock.json"
           ],
           "properties": {
-            "status": {
-              "const": "success"
+            "identifiability.json": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
             },
-            "data": {
-              "type": "object",
-              "additionalProperties": false,
-              "required": [
-                "authority",
-                "core_version",
-                "document_sha256",
-                "hold_reasons",
-                "producer_status",
-                "schema_versions",
-                "study_id"
-              ],
-              "properties": {
-                "authority": {
-                  "const": "IDENTIFIABILITY_EVIDENCE_ONLY"
-                },
-                "core_version": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "document_sha256": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": [
-                    "identifiability.json",
-                    "pec_candidate_evidence.json",
-                    "phytoresolve_proposed_events.json",
-                    "study_lock.json"
-                  ],
-                  "properties": {
-                    "identifiability.json": {
-                      "type": "string",
-                      "pattern": "^[0-9a-f]{64}$"
-                    },
-                    "pec_candidate_evidence.json": {
-                      "type": "string",
-                      "pattern": "^[0-9a-f]{64}$"
-                    },
-                    "phytoresolve_proposed_events.json": {
-                      "type": "string",
-                      "pattern": "^[0-9a-f]{64}$"
-                    },
-                    "study_lock.json": {
-                      "type": "string",
-                      "pattern": "^[0-9a-f]{64}$"
-                    }
-                  }
-                },
-                "hold_reasons": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  },
-                  "uniqueItems": true
-                },
-                "producer_status": {
-                  "type": "string",
-                  "enum": [
-                    "COMPILED_FOR_INDEPENDENT_REVIEW",
-                    "HOLD",
-                    "INVALID"
-                  ]
-                },
-                "schema_versions": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": [
-                    "identifiability.json",
-                    "pec_candidate_evidence.json",
-                    "phytoresolve_proposed_events.json",
-                    "study_lock.json"
-                  ],
-                  "properties": {
-                    "identifiability.json": {
-                      "type": "string"
-                    },
-                    "pec_candidate_evidence.json": {
-                      "type": "string"
-                    },
-                    "phytoresolve_proposed_events.json": {
-                      "type": "string"
-                    },
-                    "study_lock.json": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "study_id": {
-                  "type": "string",
-                  "minLength": 1
-                }
-              }
+            "pec_candidate_evidence.json": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
             },
-            "target_selected": {
-              "const": false
+            "phytoresolve_proposed_events.json": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
             },
-            "target_selection": {
-              "type": "object",
-              "additionalProperties": false,
-              "required": [
-                "allowed",
-                "status"
-              ],
-              "properties": {
-                "allowed": {
-                  "const": false
-                },
-                "status": {
-                  "const": "PROHIBITED"
-                }
-              }
+            "study_lock.json": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
             }
           }
         },
-        {
+        "hold_reasons": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "producer_status": {
+          "type": "string",
+          "enum": [
+            "COMPILED_FOR_INDEPENDENT_REVIEW",
+            "HOLD",
+            "INVALID"
+          ]
+        },
+        "schema_versions": {
           "type": "object",
           "additionalProperties": false,
           "required": [
-            "status",
-            "error",
-            "error_code",
-            "remediation",
-            "target_selected",
-            "target_selection"
+            "identifiability.json",
+            "pec_candidate_evidence.json",
+            "phytoresolve_proposed_events.json",
+            "study_lock.json"
           ],
           "properties": {
-            "status": {
-              "const": "error"
+            "identifiability.json": {
+              "type": "string"
             },
-            "error": {
-              "type": "string",
-              "minLength": 1
+            "pec_candidate_evidence.json": {
+              "type": "string"
             },
-            "error_code": {
-              "type": "string",
-              "minLength": 1
+            "phytoresolve_proposed_events.json": {
+              "type": "string"
             },
-            "remediation": {
-              "type": "string",
-              "minLength": 1
-            },
-            "target_selected": {
-              "const": false
-            },
-            "target_selection": {
-              "type": "object",
-              "additionalProperties": false,
-              "required": [
-                "allowed",
-                "status"
-              ],
-              "properties": {
-                "allowed": {
-                  "const": false
-                },
-                "status": {
-                  "const": "PROHIBITED"
-                }
-              }
+            "study_lock.json": {
+              "type": "string"
             }
           }
+        },
+        "study_id": {
+          "type": "string",
+          "minLength": 1
         }
-      ]
+      }
     }
   },
   {
@@ -402,130 +230,54 @@
           "type": "object",
           "additionalProperties": false,
           "required": [
-            "status",
-            "data",
-            "target_selected",
-            "target_selection"
+            "capsule_digest",
+            "capsule_valid",
+            "capsule_semantics_trusted",
+            "core_version",
+            "document_count",
+            "hold_reasons",
+            "producer_status",
+            "validation_authority",
+            "validation_mode"
           ],
           "properties": {
-            "status": {
-              "const": "success"
+            "capsule_digest": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
             },
-            "data": {
-              "oneOf": [
-                {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": [
-                    "capsule_digest",
-                    "capsule_valid",
-                    "capsule_semantics_trusted",
-                    "core_version",
-                    "document_count",
-                    "hold_reasons",
-                    "producer_status",
-                    "validation_authority",
-                    "validation_mode"
-                  ],
-                  "properties": {
-                    "capsule_digest": {
-                      "type": "string",
-                      "pattern": "^[0-9a-f]{64}$"
-                    },
-                    "capsule_valid": {
-                      "const": true
-                    },
-                    "capsule_semantics_trusted": {
-                      "const": true
-                    },
-                    "core_version": {
-                      "type": "string",
-                      "minLength": 1
-                    },
-                    "document_count": {
-                      "const": 5
-                    },
-                    "hold_reasons": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      },
-                      "uniqueItems": true
-                    },
-                    "producer_status": {
-                      "type": "string",
-                      "enum": [
-                        "COMPILED_FOR_INDEPENDENT_REVIEW",
-                        "HOLD",
-                        "INVALID"
-                      ]
-                    },
-                    "validation_authority": {
-                      "const": "STUDY_RECOMPUTED_STRUCTURE_AND_SEMANTICS"
-                    },
-                    "validation_mode": {
-                      "const": "STUDY_RECOMPUTED"
-                    }
-                  }
-                },
-                {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": [
-                    "capsule_digest",
-                    "capsule_valid",
-                    "capsule_semantics_trusted",
-                    "core_version",
-                    "document_count",
-                    "validation_authority",
-                    "validation_mode"
-                  ],
-                  "properties": {
-                    "capsule_digest": {
-                      "type": "string",
-                      "pattern": "^[0-9a-f]{64}$"
-                    },
-                    "capsule_valid": {
-                      "const": true
-                    },
-                    "capsule_semantics_trusted": {
-                      "const": false
-                    },
-                    "core_version": {
-                      "type": "string",
-                      "minLength": 1
-                    },
-                    "document_count": {
-                      "const": 5
-                    },
-                    "validation_authority": {
-                      "const": "EXTERNALLY_ANCHORED_INTEGRITY_ONLY"
-                    },
-                    "validation_mode": {
-                      "const": "EXTERNAL_DIGEST_ANCHORED"
-                    }
-                  }
-                }
+            "capsule_valid": {
+              "const": true
+            },
+            "capsule_semantics_trusted": {
+              "const": true
+            },
+            "core_version": {
+              "type": "string",
+              "minLength": 1
+            },
+            "document_count": {
+              "const": 5
+            },
+            "hold_reasons": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "uniqueItems": true
+            },
+            "producer_status": {
+              "type": "string",
+              "enum": [
+                "COMPILED_FOR_INDEPENDENT_REVIEW",
+                "HOLD",
+                "INVALID"
               ]
             },
-            "target_selected": {
-              "const": false
+            "validation_authority": {
+              "const": "STUDY_RECOMPUTED_STRUCTURE_AND_SEMANTICS"
             },
-            "target_selection": {
-              "type": "object",
-              "additionalProperties": false,
-              "required": [
-                "allowed",
-                "status"
-              ],
-              "properties": {
-                "allowed": {
-                  "const": false
-                },
-                "status": {
-                  "const": "PROHIBITED"
-                }
-              }
+            "validation_mode": {
+              "const": "STUDY_RECOMPUTED"
             }
           }
         },
@@ -533,47 +285,37 @@
           "type": "object",
           "additionalProperties": false,
           "required": [
-            "status",
-            "error",
-            "error_code",
-            "remediation",
-            "target_selected",
-            "target_selection"
+            "capsule_digest",
+            "capsule_valid",
+            "capsule_semantics_trusted",
+            "core_version",
+            "document_count",
+            "validation_authority",
+            "validation_mode"
           ],
           "properties": {
-            "status": {
-              "const": "error"
-            },
-            "error": {
+            "capsule_digest": {
               "type": "string",
-              "minLength": 1
+              "pattern": "^[0-9a-f]{64}$"
             },
-            "error_code": {
-              "type": "string",
-              "minLength": 1
+            "capsule_valid": {
+              "const": true
             },
-            "remediation": {
-              "type": "string",
-              "minLength": 1
-            },
-            "target_selected": {
+            "capsule_semantics_trusted": {
               "const": false
             },
-            "target_selection": {
-              "type": "object",
-              "additionalProperties": false,
-              "required": [
-                "allowed",
-                "status"
-              ],
-              "properties": {
-                "allowed": {
-                  "const": false
-                },
-                "status": {
-                  "const": "PROHIBITED"
-                }
-              }
+            "core_version": {
+              "type": "string",
+              "minLength": 1
+            },
+            "document_count": {
+              "const": 5
+            },
+            "validation_authority": {
+              "const": "EXTERNALLY_ANCHORED_INTEGRITY_ONLY"
+            },
+            "validation_mode": {
+              "const": "EXTERNAL_DIGEST_ANCHORED"
             }
           }
         }

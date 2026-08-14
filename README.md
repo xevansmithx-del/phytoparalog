@@ -40,20 +40,20 @@ what it only bounds, and which missing receipts or reference features still bloc
 ## Install
 
 Download the wheel from the
-[`v0.1.0` GitHub release](https://github.com/xevansmithx-del/phytoparalog/releases/tag/v0.1.0),
+[`v0.1.1` GitHub release](https://github.com/xevansmithx-del/phytoparalog/releases/tag/v0.1.1),
 then install that reviewed artifact:
 
 ```bash
-python -m pip install ./phytoparalog-0.1.0-py3-none-any.whl
+python -m pip install ./phytoparalog-0.1.1-py3-none-any.whl
 ```
 
 For the optional ToolUniverse plugin:
 
 ```bash
-python -m pip install 'tooluniverse==1.4.1' ./phytoparalog-0.1.0-py3-none-any.whl
+python -m pip install 'tooluniverse==1.4.1' ./phytoparalog-0.1.1-py3-none-any.whl
 ```
 
-The initial release workflow publishes GitHub artifacts only. It does not claim that a package
+The release workflow publishes GitHub artifacts only. It does not claim that a package
 with this name is available from PyPI.
 
 ## Quick start

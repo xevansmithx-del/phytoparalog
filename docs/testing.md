@@ -66,7 +66,7 @@ uv run --frozen --no-sync pytest tests/test_integration_contracts.py
 - packaged JSON config loading;
 - generated `tu.tools` callables;
 - valid fixture calls and structured invalid-input errors;
-- schemas with explicit success and error branches;
+- success-data schemas plus a separately validated closed error-envelope contract;
 - names no longer than 55 characters;
 - adapter-owned closed validation behind a transport-permissive ToolUniverse parameter schema;
 - malformed types, unknown keys, caller operations, and bad digests retain the adapter envelope;
@@ -103,7 +103,7 @@ tested before upload.
 
 ## Release policy
 
-Only the `v0.1.0` tag activates the initial release workflow. Its read-only verification job
+Only the `v0.1.1` tag activates the patch-release workflow. Its read-only verification job
 rebuilds twice from the frozen lock, runs the complete suite, scans public contents, checks package
 metadata, installs the wheel into a clean environment, validates the synthetic fixture, and records
 SHA-256 checksums. A separate minimal `contents: write` job verifies those checksums and creates the

@@ -3,6 +3,8 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import subprocess
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -24,6 +26,35 @@ from phytoparalog_tu.tool import (  # noqa: E402
 
 ROOT = Path(__file__).parents[1]
 CONFIG_PATH = ROOT / "src" / "phytoparalog_tu" / "data" / "phytoparalog_tools.json"
+TOOLUNIVERSE_DOC = ROOT / "docs" / "tooluniverse.md"
+ERROR_SCHEMA = {
+    "type": "object",
+    "additionalProperties": False,
+    "required": [
+        "status",
+        "error",
+        "error_code",
+        "remediation",
+        "target_selected",
+        "target_selection",
+    ],
+    "properties": {
+        "status": {"const": "error"},
+        "error": {"type": "string", "minLength": 1},
+        "error_code": {"type": "string", "minLength": 1},
+        "remediation": {"type": "string", "minLength": 1},
+        "target_selected": {"const": False},
+        "target_selection": {
+            "type": "object",
+            "additionalProperties": False,
+            "required": ["allowed", "status"],
+            "properties": {
+                "allowed": {"const": False},
+                "status": {"const": "PROHIBITED"},
+            },
+        },
+    },
+}
 
 
 def _configs() -> list[dict[str, Any]]:
@@ -34,6 +65,16 @@ def _config(name: str) -> dict[str, Any]:
     return next(config for config in _configs() if config["name"] == name)
 
 
+def _validate_result(result: dict[str, Any], return_schema: dict[str, Any]) -> None:
+    if result.get("status") == "success":
+        assert set(result) == {"status", "data", "target_selected", "target_selection"}
+        assert result["target_selected"] is False
+        assert result["target_selection"] == {"allowed": False, "status": "PROHIBITED"}
+        jsonschema.validate(result["data"], return_schema)
+        return
+    jsonschema.validate(result, ERROR_SCHEMA)
+
+
 def test_tool_configs_defer_inputs_and_strictly_schema_check_outputs() -> None:
     configs = _configs()
     assert {config["name"] for config in configs} == {
@@ -42,6 +83,7 @@ def test_tool_configs_defer_inputs_and_strictly_schema_check_outputs() -> None:
         "PhytoParalog_validate_capsule",
     }
     for config in configs:
+        jsonschema.Draft202012Validator.check_schema(config["return_schema"])
         assert len(config["name"]) <= 55
         assert config["type"] == "PhytoParalogTool"
         assert config["parameter"]["additionalProperties"] is True
@@ -53,11 +95,10 @@ def test_tool_configs_defer_inputs_and_strictly_schema_check_outputs() -> None:
             "validate_capsule",
         }
         assert len(config["description"]) >= 150
-        assert "oneOf" in config["return_schema"]
-        assert len(config["return_schema"]["oneOf"]) == 2
+        assert not {"status", "data"} & set(config["return_schema"].get("properties", {}))
         for example in config["test_examples"]:
             output = PhytoParalogTool(config).run(example)
-            jsonschema.validate(output, config["return_schema"])
+            _validate_result(output, config["return_schema"])
             assert output["status"] == "success"
             assert output["target_selected"] is False
             assert output["target_selection"] == {
@@ -66,10 +107,16 @@ def test_tool_configs_defer_inputs_and_strictly_schema_check_outputs() -> None:
             }
 
 
+def test_public_docs_declare_the_inner_success_data_schema_contract() -> None:
+    documentation = TOOLUNIVERSE_DOC.read_text(encoding="utf-8")
+    assert "validates `return_schema` against the inner `data` object" in documentation
+    assert "adapter-owned error envelope remains a separate typed contract" in documentation
+
+
 def test_direct_class_error_contract_matches_schema() -> None:
     for config in _configs():
         output = PhytoParalogTool(config).run({})
-        jsonschema.validate(output, config["return_schema"])
+        _validate_result(output, config["return_schema"])
         assert output["status"] == "error"
         assert output["error_code"] == "INVALID_ARGUMENTS"
         assert output["target_selected"] is False
@@ -110,7 +157,7 @@ def test_external_digest_authenticates_bytes_not_semantics(tmp_path: Path) -> No
         }
     )
 
-    jsonschema.validate(output, _config("PhytoParalog_validate_capsule")["return_schema"])
+    _validate_result(output, _config("PhytoParalog_validate_capsule")["return_schema"])
     assert output["status"] == "success"
     assert output["data"]["capsule_valid"] is True
     assert output["data"]["capsule_semantics_trusted"] is False
@@ -143,7 +190,7 @@ def test_capsule_numeric_overflow_uses_capsule_error_envelope(tmp_path: Path) ->
             "expected_capsule_digest": manifest["capsule_digest"],
         }
     )
-    jsonschema.validate(output, _config("PhytoParalog_validate_capsule")["return_schema"])
+    _validate_result(output, _config("PhytoParalog_validate_capsule")["return_schema"])
     assert output["status"] == "error"
     assert output["error_code"] == "CAPSULE_INVALID"
 
@@ -172,7 +219,7 @@ def test_capsule_oversized_integer_uses_capsule_error_envelope(tmp_path: Path) -
             "expected_capsule_digest": manifest["capsule_digest"],
         }
     )
-    jsonschema.validate(output, _config("PhytoParalog_validate_capsule")["return_schema"])
+    _validate_result(output, _config("PhytoParalog_validate_capsule")["return_schema"])
     assert output["status"] == "error"
     assert output["error_code"] == "CAPSULE_INVALID"
 
@@ -196,7 +243,7 @@ def test_core_validation_error_does_not_echo_caller_capsule_path(
     monkeypatch.setattr("phytoparalog_tu.tool._core", lambda: core)
 
     direct = PhytoParalogTool(config).run(arguments)
-    jsonschema.validate(direct, config["return_schema"])
+    _validate_result(direct, config["return_schema"])
     assert direct["status"] == "error"
     assert direct["error_code"] == "CAPSULE_INVALID"
     assert str(tmp_path) not in direct["error"]
@@ -207,7 +254,7 @@ def test_core_validation_error_does_not_echo_caller_capsule_path(
     tu = ToolUniverse()
     tu.load_tools(include_tools=["PhytoParalog_validate_capsule"])
     loaded = tu.tools.PhytoParalog_validate_capsule(**arguments)
-    jsonschema.validate(loaded, config["return_schema"])
+    _validate_result(loaded, config["return_schema"])
     assert loaded["status"] == "error"
     assert loaded["error_code"] == "CAPSULE_INVALID"
     assert str(tmp_path) not in loaded["error"]
@@ -230,7 +277,7 @@ def test_fifo_capsule_member_uses_capsule_error_envelope(tmp_path: Path) -> None
             "expected_capsule_digest": manifest["capsule_digest"],
         }
     )
-    jsonschema.validate(output, _config("PhytoParalog_validate_capsule")["return_schema"])
+    _validate_result(output, _config("PhytoParalog_validate_capsule")["return_schema"])
     assert output["status"] == "error"
     assert output["error_code"] == "CAPSULE_INVALID"
 
@@ -256,7 +303,7 @@ def test_extreme_capsule_json_nesting_uses_capsule_error_envelope(tmp_path: Path
             "expected_capsule_digest": manifest["capsule_digest"],
         }
     )
-    jsonschema.validate(output, _config("PhytoParalog_validate_capsule")["return_schema"])
+    _validate_result(output, _config("PhytoParalog_validate_capsule")["return_schema"])
     assert output["status"] == "error"
     assert output["error_code"] == "CAPSULE_INVALID"
 
@@ -265,7 +312,7 @@ def test_lone_surrogate_uses_typed_tooluniverse_errors(tmp_path: Path) -> None:
     fixture = _fixture_payload()
     fixture["study_id"] = "bad\ud800id"
     direct = PhytoParalogTool(_config("PhytoParalog_compile")).run({"study": fixture})
-    jsonschema.validate(direct, _config("PhytoParalog_compile")["return_schema"])
+    _validate_result(direct, _config("PhytoParalog_compile")["return_schema"])
     assert direct["status"] == "error"
     assert direct["error_code"] == "INVALID_STUDY"
 
@@ -289,7 +336,7 @@ def test_lone_surrogate_uses_typed_tooluniverse_errors(tmp_path: Path) -> None:
             "expected_capsule_digest": manifest["capsule_digest"],
         }
     )
-    jsonschema.validate(
+    _validate_result(
         capsule_output,
         _config("PhytoParalog_validate_capsule")["return_schema"],
     )
@@ -411,7 +458,7 @@ def test_loaded_tooluniverse_invalid_inputs_use_adapter_envelopes(tmp_path: Path
             # can return its stable, target-prohibiting error contract.
             jsonschema.validate(arguments, config["parameter"])
             result = getattr(tu.tools, name)(**arguments)
-            jsonschema.validate(result, config["return_schema"])
+            _validate_result(result, config["return_schema"])
             assert result["status"] == "error"
             assert result["error_code"] == "INVALID_ARGUMENTS"
             assert result["target_selected"] is False
@@ -425,3 +472,17 @@ def test_plugin_class_is_registered() -> None:
     from tooluniverse.tool_registry import get_tool_registry
 
     assert get_tool_registry()["PhytoParalogTool"] is PhytoParalogTool
+
+
+@pytest.mark.parametrize("name", [config["name"] for config in _configs()])
+def test_tooluniverse_cli_example_validates_inner_success_data(name: str) -> None:
+    completed = subprocess.run(
+        [sys.executable, "-m", "tooluniverse.cli", "test", "--json", name],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    report = json.loads(completed.stdout)
+    assert report["status"] == "success"
+    assert report["passed"] == report["total"] == 1

@@ -16,7 +16,7 @@ def test_validate_and_version(capsys) -> None:
     assert main(["validate", str(FIXTURE)]) == 0
     assert json.loads(capsys.readouterr().out)["status"] == "VALID"
     assert main(["version"]) == 0
-    assert capsys.readouterr().out.strip() == "0.1.0"
+    assert capsys.readouterr().out.strip() == "0.1.1"
 
 
 def test_compile_stdout_has_no_local_output_path(tmp_path: Path, capsys) -> None:
